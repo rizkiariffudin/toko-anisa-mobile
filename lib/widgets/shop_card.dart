@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:toko_anisa/screens/shoplist_form.dart';
 import 'package:toko_anisa/screens/show_item.dart';
+
+import '../screens/list_item.dart';
+import '../screens/login.dart';
 
 class MenuItem {
   final String name;
@@ -29,11 +34,13 @@ class MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Material(
       color: item.color,
       child: InkWell(
         // Area responsive terhadap sentuhan
-        onTap: () {
+        onTap: () async {
           // Memunculkan SnackBar ketika diklik
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -44,7 +51,7 @@ class MenuCard extends StatelessWidget {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const ItemsPage(),
+                  builder: (context) => const ItemPage(),
                 ));
           }
 
@@ -57,6 +64,29 @@ class MenuCard extends StatelessWidget {
                 builder: (context) => const ItemFormPage(),
               ),
             );
+          }
+
+          // statement if sebelumnya
+          // tambahkan else if baru seperti di bawah ini
+          if (item.name == "Logout") {
+            final response = await request.logout(
+              // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
+                "http://localhost:8000/auth/logout/");
+            String message = response["message"];
+            if (response['status']) {
+              String uname = response["username"];
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("$message Sampai jumpa, $uname."),
+              ));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("$message"),
+              ));
+            }
           }
         },
         child: Container(

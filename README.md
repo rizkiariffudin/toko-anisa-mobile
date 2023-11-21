@@ -464,3 +464,315 @@ class LeftDrawer extends StatelessWidget {
 }
 ```
 Setelah itu, kita perlu memanggil *widget* `LeftDrawer` pada setiap *screen* yang akan kita buat selanjutnya. Kita akan memanggil *widget* `LeftDrawer` pada `menu.dart`, `shoplist_form.dart`, dan `show_item.dart`.
+
+#   Tugas 9: Integrasi Layanan Web Django dengan Aplikasi Flutter
+## Apakah bisa kita melakukan pengambilan data JSON tanpa membuat model terlebih dahulu? Jika iya, apakah hal tersebut lebih baik daripada membuat model sebelum melakukan pengambilan data JSON?
+### Pengambilan Data Tanpa Model
+
+Ya, kita bisa melakukan pengambilan data JSON tanpa membuat model terlebih dahulu. Pada kasus ini, kita dapat menggunakan _dynamic_ atau Map sebagai tipe data untuk menampung hasil parsing JSON.
+
+Contoh pengambilan data tanpa model:
+
+```dart
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+Future<void> fetchData() async {
+  final response = await http.get('https://example.com/api/data');
+  
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> data = json.decode(response.body);
+    // Proses data sesuai kebutuhan
+  } else {
+    // Handle kesalahan
+  }
+}
+```
+### Apakah lebih baik daripada dengan Model?
+Tidak, meskipun kita bisa menggunakan pendekatan _dynamic_, membuat model sebelumnya memiliki beberapa keuntungan. Dengan membuat model, kita dapat:
+1. Tipe Data yang Tepat
+Model membantu dalam menentukan tipe data yang tepat untuk setiap properti, meningkatkan keamanan dan kemudahan pemahaman.
+
+2. Kode yang Bersih
+Model membantu dalam mengorganisasi kode dengan lebih baik, membuatnya lebih mudah dipahami dan dikelola.
+
+3. _Auto-generate_ Kode
+Sejumlah _tool_ dan _library_ Flutter dapat memanfaatkan model untuk menghasilkan kode otomatis, seperti _JSON serialization_ dengan _Dart build runner_.
+
+## Jelaskan fungsi dari CookieRequest dan jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+### CookieRequest: Fungsi dan Pentingnya
+
+`CookieRequest` dalam konteks aplikasi Flutter dapat diartikan sebagai objek atau model yang berfungsi untuk menyimpan dan mengelola informasi terkait cookie dalam permintaan (*request*) HTTP. Cookie merupakan mekanisme penyimpanan data di sisi klien yang digunakan untuk melacak dan menyimpan informasi tertentu, seperti sesi pengguna.
+
+### Mengapa Instance CookieRequest Perlu Dibagikan
+
+Instance `CookieRequest` perlu dibagikan ke semua komponen dalam aplikasi Flutter karena:
+
+1. **Konsistensi Informasi Cookie:** Dengan menggunakan instance `CookieRequest` yang sama di seluruh aplikasi, kita dapat memastikan konsistensi dalam pengelolaan dan pertukaran informasi cookie. Ini meminimalkan kemungkinan adanya inkonsistensi antara berbagai bagian aplikasi.
+
+2. **Single Source of Truth:** Instance `CookieRequest` yang dibagikan berfungsi sebagai *single source of truth* terkait informasi cookie. Hal ini memudahkan untuk memperbarui atau memodifikasi cookie, dan perubahan tersebut akan terjadi secara konsisten di seluruh aplikasi.
+
+3. **Efisiensi dan Keberlanjutan Kode:** Dengan membagikan instance, kita dapat menghindari duplikasi kode yang tidak perlu, mengurangi kompleksitas, dan memastikan bahwa setiap komponen aplikasi berinteraksi dengan data cookie melalui objek yang sama.
+
+4. **Pemeliharaan Mudah:** Jika terjadi perubahan dalam struktur atau perilaku cookie, perubahan tersebut hanya perlu dilakukan pada satu instance `CookieRequest`, menyederhanakan pemeliharaan dan mengurangi potensi kesalahan.
+
+### Contoh Pemakaian
+
+```dart
+class MyApp extends StatelessWidget {
+  final CookieRequest cookieRequest;
+
+  MyApp({required this.cookieRequest});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyHomePage(cookieRequest: cookieRequest),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  final CookieRequest cookieRequest;
+
+  MyHomePage({required this.cookieRequest});
+
+  // ... Widget build dan logika lainnya ...
+}
+```
+Dalam contoh di atas, `MyApp` memasukkan _instance_ `CookieRequest` ke dalam `MyHomePage`. Dengan demikian, seluruh halaman atau komponen di dalam aplikasi dapat berbagi informasi _cookie_ melalui instance yang sama.
+
+## Jelaskan mekanisme pengambilan data dari JSON hingga dapat ditampilkan pada Flutter.
+
+### Pengambilan Data JSON
+
+1. **Pemanggilan API atau Server:**
+  - Aplikasi Flutter membuat permintaan ke API atau server yang menyediakan data dalam format JSON.
+  - Penggunaan paket atau fungsi seperti `http` atau `dio` dapat membantu dalam membuat permintaan HTTP.
+
+2. **Respon dari Server:**
+  - Server merespons dengan data dalam format JSON yang dikirim kembali ke aplikasi Flutter.
+  - Data ini biasanya diterima dalam bentuk `Response` atau `HttpResponse`.
+
+3. **Konversi ke Objek Dart:**
+  - Data JSON perlu dikonversi menjadi objek Dart agar dapat diolah lebih lanjut.
+  - Pemakaian paket atau metode deserialization, seperti `dart:convert` atau library eksternal, membantu mengonversi JSON menjadi objek Dart.
+
+4. **Penyimpanan Data:**
+  - Objek Dart yang dihasilkan dari data JSON dapat disimpan dalam model atau struktur data yang sesuai dengan kebutuhan aplikasi.
+  - Model ini bisa berupa objek tunggal atau koleksi objek, seperti daftar atau peta.
+
+### Tampilan Data pada Flutter
+
+1. **State Management:**
+  - Data yang diambil dari JSON umumnya dielola menggunakan mekanisme *state management* untuk memastikan pembaruan tampilan saat data berubah.
+  - Digunakan metode seperti `setState`, *provider*, *Riverpod*, atau paket state management lainnya.
+
+2. **Widget untuk Tampilan:**
+  - Data yang sudah dikonversi dan dikelola dapat ditampilkan melalui berbagai widget di Flutter.
+  - Widget seperti `ListView`, `GridView`, `Column`, dan `Row` sering digunakan untuk menampilkan daftar atau tata letak tertentu.
+
+3. **Pembuatan Widget Khusus:**
+  - Kadang-kadang, dibuat widget khusus yang bertanggung jawab atas menampilkan data tertentu.
+  - Widget ini dapat menerima objek atau data sebagai argumen dan merancang tampilannya sesuai.
+
+4. **Pemisahan Logika dan Tampilan:**
+  - Adalah praktik baik untuk memisahkan logika bisnis (pengolahan data) dan tampilan (widget).
+  - Ini dapat dilakukan melalui fungsi atau metode terpisah yang menerima data dan mengembalikan widget.
+
+### Contoh Kode Singkat
+
+```dart
+// Pengambilan dan konversi data dari JSON
+Future<List<Post>> fetchPosts() async {
+  final response = await http.get(Uri.parse('https://example.com/posts'));
+  if (response.statusCode == 200) {
+    // Konversi JSON ke objek Dart
+    List<dynamic> data = json.decode(response.body);
+    return data.map((item) => Post.fromJson(item)).toList();
+  } else {
+    throw Exception('Gagal mengambil data dari server');
+  }
+}
+
+// Widget untuk menampilkan data
+class PostListWidget extends StatelessWidget {
+  final Future<List<Post>> posts;
+
+  PostListWidget({required this.posts});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Post>>(
+      future: posts,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          // Menampilkan data menggunakan ListView
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(snapshot.data![index].title),
+                subtitle: Text(snapshot.data![index].body),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+}
+```
+Dalam contoh tersebut, fungsi `fetchPosts` mengambil data dari server dan mengonversinya menjadi objek Dart. Widget `PostListWidget` menggunakan `FutureBuilder` untuk menangani tampilan berdasarkan status pengambilan data.
+
+## Jelaskan mekanisme autentikasi dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+
+### Registrasi Akun
+1. **Pengisian Formulir Registrasi:**
+  - Pengguna di aplikasi Flutter mengisi formulir registrasi, termasuk informasi seperti username, password, dan email.
+
+2. **Pengiriman Data ke Server Django:**
+  - Data formulir registrasi dikirim ke server Django melalui permintaan HTTP POST.
+  - Endpoints pada server Django diatur untuk menangani permintaan registrasi, memvalidasi data, dan membuat akun pengguna baru.
+
+3. **Proses Registrasi di Django:**
+  - Server Django memproses permintaan, memastikan data valid, dan membuat entri baru di database untuk akun pengguna.
+  - Password disimpan dalam bentuk yang aman, seperti hash.
+
+### Autentikasi Login
+1. **Pengisian Formulir Login:**
+  - Pengguna di aplikasi Flutter mengisi formulir login, memasukkan username dan password.
+
+2. **Pengiriman Data ke Server Django:**
+  - Data login dikirim ke server Django melalui permintaan HTTP POST.
+  - Server Django memiliki endpoint khusus untuk menangani permintaan login.
+
+3. **Proses Login di Django:**
+  - Server Django memeriksa kecocokan username dan password.
+  - Jika cocok, server menghasilkan token otentikasi yang dikirim kembali ke aplikasi Flutter.
+
+### Penanganan Token di Aplikasi Flutter
+1. **Penyimpanan Token di Aplikasi:**
+  - Aplikasi Flutter menyimpan token otentikasi yang diterima dari server Django, biasanya diatur sebagai bagian dari penyimpanan lokal.
+
+2. **Penggunaan Token untuk Permintaan Selanjutnya:**
+  - Setiap permintaan selanjutnya dari aplikasi Flutter ke server Django mencakup token otentikasi di header permintaan.
+  - Server Django menggunakan token ini untuk mengidentifikasi pengguna yang terautentikasi.
+
+### Tampilan Menu Setelah Autentikasi
+1. **Penanganan Status Otentikasi:**
+  - Saat aplikasi Flutter diluncurkan, atau ketika pengguna mengakses bagian tertentu, status otentikasi diperiksa.
+  - Jika token otentikasi tersedia, pengguna dianggap terautentikasi dan dapat melihat menu tertentu.
+
+2. **Pengambilan Data Menu dari Django:**
+  - Aplikasi Flutter dapat mengirim permintaan ke server Django untuk mendapatkan data menu yang sesuai dengan pengguna yang terautentikasi.
+  - Server Django memproses permintaan ini dan mengirim kembali data menu dalam format JSON.
+
+3. **Tampilan Menu di Aplikasi Flutter:**
+  - Aplikasi Flutter menggunakan data menu yang diterima untuk membangun tampilan menu yang sesuai.
+  - Pengguna dapat melihat dan berinteraksi dengan menu sesuai dengan hak akses yang dimilikinya.
+
+### Contoh Kode Singkat
+```dart
+// Fungsi untuk melakukan login dan mendapatkan token
+Future<String> loginUser(String username, String password) async {
+  final response = await http.post(
+    Uri.parse('https://example.com/api/token/'),
+    body: {
+      'username': username,
+      'password': password,
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> data = json.decode(response.body);
+    return data['access_token'];
+  } else {
+    throw Exception('Gagal melakukan login');
+  }
+}
+
+// Fungsi untuk mengambil data menu dari server
+Future<List<Menu>> fetchMenu(String token) async {
+  final response = await http.get(
+    Uri.parse('https://example.com/api/menu/'),
+    headers: {
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((item) => Menu.fromJson(item)).toList();
+  } else {
+    throw Exception('Gagal mengambil data menu');
+  }
+}
+```
+Dalam contoh tersebut, fungsi loginUser mengirimkan data login ke server Django dan mengembalikan token otentikasi. Fungsi fetchMenu digunakan untuk mengambil data menu dari server menggunakan token otentikasi.
+
+## Sebutkan seluruh widget yang kamu pakai pada tugas ini dan jelaskan fungsinya masing-masing.
+
+1. **Scaffold**
+  - **Fungsi**: Membentuk kerangka tampilan aplikasi Flutter dengan menyediakan struktur dasar, termasuk komponen-komponen seperti AppBar, body, drawer, dan sebagainya.
+
+2. **ListView.builder**
+  - **Fungsi**: Menciptakan daftar secara dinamis berdasarkan data yang ada. Menggunakan builder untuk membuat item-item dalam daftar sesuai dengan jumlah data yang diberikan, mengoptimalkan penggunaan memori dengan hanya membangun item yang terlihat di layar.
+
+3. **TextFormField**
+  - **Fungsi**: Memungkinkan pengguna memasukkan teks. Ini adalah elemen input yang mengumpulkan teks dari pengguna, umumnya digunakan dalam formulir atau untuk memasukkan informasi tertentu.
+
+4. **ElevatedButton**
+  - **Fungsi**: Menampilkan tombol yang memberikan aksi tertentu ketika ditekan. Digunakan untuk tindakan seperti mengirim formulir, mengkonfirmasi tindakan, atau melakukan aksi yang relevan dalam aplikasi.
+
+5. **FutureBuilder**
+  - **Fungsi**: Membangun antarmuka pengguna berdasarkan hasil dari interaksi dengan objek `Future`. Ini memungkinkan pembangunan UI yang responsif, menampilkan tampilan yang sesuai tergantung pada status dari objek `Future`, seperti menampilkan loading saat data sedang dimuat, menampilkan data ketika selesai dimuat, atau menampilkan pesan kesalahan jika ada masalah saat memuat data.
+
+##  Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+### Setup Django:
+
+1. Buat aplikasi Django dengan nama 'authentication'.
+2. Sertakan 'authentication' di dalam `INSTALLED_APPS` dalam `settings.py`.
+3. Pasang `django-cors-headers` dan tambahkan ke `INSTALLED_APPS`.
+4. Aktifkan `CorsMiddleware` di `settings.py`.
+5. Konfigurasi variabel pada `settings.py` untuk mengizinkan akses dan memastikan pengaturan keamanan yang sesuai.
+
+### Pembuatan Login View di Django:
+
+6. Bangun view untuk login di `authentication/views.py`.
+7. Tentukan logika autentikasi menggunakan `authenticate` dan `login`.
+8. Buat URL routing untuk view login di `authentication/urls.py`.
+
+### Setup Flutter:
+
+9. Instal paket `provider` dan `pbp_django_auth` pada proyek Flutter.
+10. Manfaatkan `Provider` untuk membagikan instance `CookieRequest` ke seluruh komponen.
+
+### Pembuatan Halaman Login di Flutter:
+
+11. Rancang halaman `login.dart` dengan menggunakan `TextEditingController` untuk inputan.
+12. Terapkan `ElevatedButton` untuk mengirimkan data login ke Django melalui `CookieRequest`.
+
+### Pengaturan Redireksi dan Pembuatan Model Kustom:
+
+13. Sesuaikan pengalihan pada file `main.dart` agar menuju halaman login.
+14. Gunakan Quicktype untuk otomatis membuat model Dart dari data JSON yang diterima dari Django.
+
+### Pengambilan Data dari Django ke Flutter:
+
+15. Pasang package `http` dan buat fungsi `fetchProduct` untuk mengambil data produk dari Django.
+16. Terapkan `FutureBuilder` untuk menampilkan data produk dari Django di halaman Flutter.
+
+### Pengiriman Produk dari Form Flutter ke Django:
+
+17. Buat view baru di Django untuk menerima data produk dari Flutter.
+18. Modifikasi tombol tambah produk di Flutter untuk mengirimkan data produk baru ke Django.
+
+### Fitur Logout:
+
+19. Implementasikan view logout di Django dan konfigurasi path di `authentication/urls.py`.
+20. Terapkan fitur logout di Flutter dengan menghubungi endpoint logout di Django melalui `CookieRequest`.
