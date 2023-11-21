@@ -15,7 +15,7 @@ class _ItemPageState extends State<ItemPage> {
   Future<List<Item>> fetchProduct() async {
     // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
     var url = Uri.parse(
-        'http://localhost:8000/json/');
+        'https://rizki-ariffudin-tugas.pbp.cs.ui.ac.id/json/');
     var response = await http.get(
       url,
       headers: {"Content-Type": "application/json"},
@@ -38,7 +38,9 @@ class _ItemPageState extends State<ItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Product'),
+          title: const Text('Toko Anisa'),
+          backgroundColor: Colors.indigo,
+          foregroundColor: Colors.white,
         ),
         drawer: const LeftDrawer(),
         body: FutureBuilder(
